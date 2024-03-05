@@ -1,14 +1,11 @@
+/*
+Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+
+*/
 package main
 
-import (
-	"github.com/spf13/cobra"
-
-	"clima/commands"
-)
+import "github.com/chuttmateo/clima/cmd"
 
 func main() {
-	var rootCmd = &cobra.Command{Use: "clima"}
-	rootCmd.AddCommand(commands.CmdPrint)
-	rootCmd.AddCommand(commands.CmdWeather)
-	rootCmd.Execute()
+	cmd.Execute()
 }

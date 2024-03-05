@@ -1,4 +1,4 @@
-module clima
+module github.com/chuttmateo/clima
 
 go 1.22.0
 
