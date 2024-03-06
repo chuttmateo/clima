@@ -49,14 +49,22 @@ type Forecast struct {
 // No parameters.
 // Returns a byte slice and an error.
 func makeRequest() ([]byte, error) {
+	return makeRequestWithLocation("")
+}
+
+func makeRequestWithLocation(location string) ([]byte, error) {
+	//get token environment variable
 	token := os.Getenv("CLIMA_TOKEN")
 	if token == "" {
 		return nil, fmt.Errorf("you need to declare an environment variable 'CLIMA_TOKEN' with your token. Create it here https://www.weatherapi.com/")
 	}
 
-	location := os.Getenv("CLIMA_LOCATION")
+	//get location environment variable if location flag is empty
 	if location == "" {
-		return nil, fmt.Errorf("you need to declare an environment variable 'CLIMA_LOCATION' with your location. For example CLIMA_LOCATION='Maria Grande, Entre Rios, Argentina'")
+		location = os.Getenv("CLIMA_LOCATION")
+		if location == "" {
+			return nil, fmt.Errorf("you need to declare an environment variable 'CLIMA_LOCATION' with your location. For example CLIMA_LOCATION='Maria Grande, Entre Rios, Argentina'")
+		}
 	}
 
 	// make GET request to API to get user by ID
@@ -93,7 +101,10 @@ func makeRequest() ([]byte, error) {
 }
 
 func GetForecast() (Forecast, error) {
-	body, err := makeRequest()
+	return GetForecastWithLocation("")
+}
+func GetForecastWithLocation(location string) (Forecast, error) {
+	body, err := makeRequestWithLocation(location)
 
 	var forecast Forecast
 

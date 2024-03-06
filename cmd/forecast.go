@@ -19,13 +19,12 @@ var forecastCmd = &cobra.Command{
 	Long:  `This command will return the forecast wheather conditions.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		forecast, err := api.GetForecast()
+		forecast, err := api.GetForecastWithLocation(location)
 		if err != nil {
 			fmt.Println("Error getting forecast:", err)
 			return
 		}
 		printForecast(forecast)
-
 	},
 }
 
