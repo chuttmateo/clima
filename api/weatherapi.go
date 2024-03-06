@@ -44,28 +44,52 @@ type Forecast struct {
 	}
 }
 
+// makeRequest makes a GET request to the weather API and returns the response body.
+//
+// No parameters.
+// Returns a byte slice and an error.
 func makeRequest() ([]byte, error) {
 	token := os.Getenv("CLIMA_TOKEN")
 	if token == "" {
-		return nil, fmt.Errorf("You need to declare an environment variable 'CLIMA_TOKEN' with your token. Create it here https://www.weatherapi.com/")
+		return nil, fmt.Errorf("you need to declare an environment variable 'CLIMA_TOKEN' with your token. Create it here https://www.weatherapi.com/")
 	}
 
-	// URL for the API call
-	url := "http://api.weatherapi.com/v1/forecast.json?key=" + token + "&q=Maria%20Grande,%20Entre%20Rios,%20Argentina&days=3&aqi=no&alerts=no"
+	location := os.Getenv("CLIMA_LOCATION")
+	if location == "" {
+		return nil, fmt.Errorf("you need to declare an environment variable 'CLIMA_LOCATION' with your location. For example CLIMA_LOCATION='Maria Grande, Entre Rios, Argentina'")
+	}
 
-	// Make the GET request
-	response, err := http.Get(url)
+	// make GET request to API to get user by ID
+	apiUrl := "http://api.weatherapi.com/v1/forecast.json"
+	request, err := http.NewRequest("GET", apiUrl, nil)
 	if err != nil {
-		fmt.Println("Error making the request:", err)
 		return nil, err
 	}
+
+	// Set query parameters
+	query := request.URL.Query()
+	query.Add("key", token)
+	query.Add("q", location)
+	query.Add("days", "3")
+	query.Add("aqi", "no")
+	query.Add("alerts", "no")
+	request.URL.RawQuery = query.Encode()
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
 	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}
+
 	return body, nil
+
 }
 
 func GetForecast() (Forecast, error) {

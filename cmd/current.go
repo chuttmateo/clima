@@ -20,6 +20,7 @@ var currentCmd = &cobra.Command{
 		forecast, err := api.GetForecast()
 		if err != nil {
 			fmt.Println("Error getting forecast:", err)
+			return
 		}
 		printCurrent(forecast)
 
