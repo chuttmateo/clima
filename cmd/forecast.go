@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/chuttmateo/clima/api"
@@ -21,6 +22,7 @@ var forecastCmd = &cobra.Command{
 		forecast, err := api.GetForecast()
 		if err != nil {
 			fmt.Println("Error getting forecast:", err)
+			return
 		}
 		printForecast(forecast)
 
@@ -44,7 +46,22 @@ func printForecast(forecast api.Forecast) {
 		fmt.Printf("Day: %s\n", day.Date)
 		fmt.Printf("Condition: %s\n", day.Day.Condition.Text)
 		for _, hour := range day.Hour {
-			fmt.Printf("Time: %s, %.1f°C, %s, %.1f%%, %d\n", getTime(hour.Time), hour.TempC, hour.Condition.Text, hour.ChanceOfRain, hour.WillItRain)
+
+			t := hour.Time
+			formattedTime, err := time.Parse("2006-01-02 15:04", t)
+			if err != nil {
+				fmt.Println("Error parsing time:", err)
+				return
+			}
+			// TODO it works but it should be improved
+			if time.Now().Day() == formattedTime.Day() {
+				if time.Now().Hour() <= formattedTime.Hour() {
+					fmt.Printf("%s => %.1f°C, chance of rain: %.1f%%, will it rain: %d, %s\n", getTime(t), hour.TempC, hour.ChanceOfRain, hour.WillItRain, strings.Trim(hour.Condition.Text, " "))
+				}
+			} else {
+				fmt.Printf("%s => %.1f°C, chance of rain: %.1f%%, will it rain: %d, %s\n", getTime(t), hour.TempC, hour.ChanceOfRain, hour.WillItRain, strings.Trim(hour.Condition.Text, " "))
+			}
+
 		}
 	}
 }
