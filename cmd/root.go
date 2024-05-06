@@ -9,15 +9,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var color bool
 var location string
+var lang string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "clima",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application.`,
+	Short: "weather cli",
+	Long:  `It is designed to fetch weather information from weatherapi.com`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -38,6 +37,9 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 	rootCmd.PersistentFlags().StringVarP(&location, "location", "l", "", "add a custom location")
+	//add a language flag for the API in order to avoid system default language
+	rootCmd.PersistentFlags().StringVarP(&lang, "language", "i", "", "add a language for the API. For example 'en' or 'es'")
 }

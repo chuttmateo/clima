@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type Forecast struct {
@@ -46,13 +47,16 @@ type Forecast struct {
 
 // makeRequest makes a GET request to the weather API and returns the response body.
 //
-// No parameters.
+// location, if provided, is added as a query parameter to the request.
+// lang, if provided, is added as a query parameter to the request.
 // Returns a byte slice and an error.
-func makeRequest() ([]byte, error) {
-	return makeRequestWithLocation("")
-}
+func makeRequest(location string, lang string) ([]byte, error) {
 
-func makeRequestWithLocation(location string) ([]byte, error) {
+	//get language environment variable if no one is sent
+	if lang == "" {
+		lang = getLangEnvironmentVariable()
+	}
+
 	//get token environment variable
 	token := os.Getenv("CLIMA_TOKEN")
 	if token == "" {
@@ -81,6 +85,7 @@ func makeRequestWithLocation(location string) ([]byte, error) {
 	query.Add("days", "3")
 	query.Add("aqi", "no")
 	query.Add("alerts", "no")
+	query.Add("lang", lang)
 	request.URL.RawQuery = query.Encode()
 
 	client := &http.Client{}
@@ -99,12 +104,8 @@ func makeRequestWithLocation(location string) ([]byte, error) {
 	return body, nil
 
 }
-
-func GetForecast() (Forecast, error) {
-	return GetForecastWithLocation("")
-}
-func GetForecastWithLocation(location string) (Forecast, error) {
-	body, err := makeRequestWithLocation(location)
+func GetForecast(location string, lang string) (Forecast, error) {
+	body, err := makeRequest(location, lang)
 
 	var forecast Forecast
 
@@ -114,4 +115,16 @@ func GetForecastWithLocation(location string) (Forecast, error) {
 	}
 
 	return forecast, err
+}
+
+func getLangEnvironmentVariable() string {
+	lang := os.Getenv("LANG")
+	if lang == "" {
+		lang = "en"
+	}
+
+	//clean environment variable from "es_ar to es"
+	langArr := strings.Split(lang, "_")
+
+	return langArr[0]
 }

@@ -15,11 +15,11 @@ import (
 // currentCmd represents the current command
 var currentCmd = &cobra.Command{
 	Use:   "current",
-	Short: "The current wheather conditions",
-	Long:  `This command will return the current wheather conditions.`,
+	Short: "The current weather conditions",
+	Long:  `This command will return the current weather conditions.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		forecast, err := api.GetForecastWithLocation(location)
+		forecast, err := api.GetForecast(location, lang)
 		if err != nil {
 			fmt.Println("Error getting forecast:", err)
 			return
