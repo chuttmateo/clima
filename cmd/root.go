@@ -41,5 +41,5 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&location, "location", "l", "", "add a custom location")
 	//add a language flag for the API in order to avoid system default language
-	rootCmd.PersistentFlags().StringVarP(&lang, "language", "i", "", "add a language for the API. For example 'en' or 'es'")
+	rootCmd.PersistentFlags().StringVarP(&lang, "language", "i", "", "add a language for the API. For example 'en', 'es', 'fr")
 }

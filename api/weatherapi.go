@@ -67,7 +67,7 @@ func makeRequest(location string, lang string) ([]byte, error) {
 	if location == "" {
 		location = os.Getenv("CLIMA_LOCATION")
 		if location == "" {
-			return nil, fmt.Errorf("you need to declare an environment variable 'CLIMA_LOCATION' with your location. For example CLIMA_LOCATION='Maria Grande, Entre Rios, Argentina'")
+			return nil, fmt.Errorf("use the location flag '-l' OR you need to declare an environment variable 'CLIMA_LOCATION' with your location. For example CLIMA_LOCATION='Maria Grande, Entre Rios, Argentina'")
 		}
 	}
 
@@ -105,26 +105,32 @@ func makeRequest(location string, lang string) ([]byte, error) {
 
 }
 func GetForecast(location string, lang string) (Forecast, error) {
-	body, err := makeRequest(location, lang)
-
 	var forecast Forecast
 
-	jsonErr := json.Unmarshal(body, &forecast)
-	if jsonErr != nil {
-		fmt.Println("Error parsing JSON:", jsonErr)
+	body, err := makeRequest(location, lang)
+	if err != nil {
+		fmt.Println("Error trying to make the request: ", err)
+		return forecast, err
+	}
+
+	//Parse json valute to Forecast
+	err = json.Unmarshal(body, &forecast)
+	if err != nil {
+		fmt.Println("Error parsing JSON:", err)
+		return forecast, err
 	}
 
 	return forecast, err
 }
 
+// get lang environment and clean it OR return 'en' as the default one
 func getLangEnvironmentVariable() string {
 	lang := os.Getenv("LANG")
 	if lang == "" {
-		lang = "en"
+		return "en"
 	}
 
 	//clean environment variable from "es_ar to es"
 	langArr := strings.Split(lang, "_")
-
 	return langArr[0]
 }
