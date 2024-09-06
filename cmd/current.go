@@ -24,8 +24,11 @@ var currentCmd = &cobra.Command{
 			fmt.Println("Error getting current forecast:", err)
 			return
 		}
-		printCurrent(forecast)
-
+		if emojis {
+			printCurrentWithEmojis(forecast)
+		} else {
+			printCurrent(forecast)
+		}
 	},
 }
 
@@ -34,13 +37,12 @@ func init() {
 }
 
 func printCurrent(forecast api.Forecast) {
-	fmt.Printf("Current weather in: %s, %s, %s\n", forecast.Location.Name, forecast.Location.Region, forecast.Location.Country)
+	fmt.Printf(" %s - %s, %s, %s\n", forecast.Current.Condition.Text, forecast.Location.Name, forecast.Location.Region, forecast.Location.Country)
+	fmt.Printf(" %.1f°C Fells like: %.1f°C\n", forecast.Current.TempC, forecast.Current.FellsLike)
+	fmt.Printf(" Humidity: %d%%\n", forecast.Current.Humidity)
 
-	fmt.Printf("Temperature: %.1f°C\n", forecast.Current.TempC)
-	fmt.Printf("Fells like: %.1f°C\n", forecast.Current.FellsLike)
-	fmt.Printf("Precipitation: %.1fmm\n", forecast.Current.PrecipMM)
-	fmt.Printf("Condition: %s\n", forecast.Current.Condition.Text)
-	fmt.Printf("Humidity: %d%%\n", forecast.Current.Humidity)
+	//add a space
+	fmt.Println()
 
 	day := forecast.Forecast.Forecastday[0]
 	for _, hour := range day.Hour {
@@ -52,8 +54,43 @@ func printCurrent(forecast api.Forecast) {
 		}
 		// TODO it works but it should be improved
 		if time.Now().Hour() <= formattedTime.Hour() {
-			fmt.Printf("%s => %.1f°C, chance of rain: %.1f%%, will it rain: %d, %s\n", getTime(t), hour.TempC, hour.ChanceOfRain, hour.WillItRain, strings.Trim(hour.Condition.Text, " "))
+			fmt.Printf(" %s => %.1f°C, chance of rain: %.1f%%, %s\n",
+				getTime(t), hour.TempC, hour.ChanceOfRain, strings.Trim(hour.Condition.Text, " "))
 		}
 
+	}
+}
+func printCurrentWithEmojis(forecast api.Forecast) {
+
+	fmt.Printf(" %s - %s, %s, %s\n", forecast.Current.Condition.Text, forecast.Location.Name, forecast.Location.Region, forecast.Location.Country)
+	fmt.Printf(" %.1f°C Fells like: %.1f°C\n", forecast.Current.TempC, forecast.Current.FellsLike)
+	fmt.Printf(" Humidity: %d%%\n", forecast.Current.Humidity)
+
+	//add a space
+	fmt.Println()
+
+	day := forecast.Forecast.Forecastday[0]
+	for _, hour := range day.Hour {
+		t := hour.Time
+		formattedTime, err := time.Parse("2006-01-02 15:04", t)
+		if err != nil {
+			fmt.Println("Error parsing time:", err)
+			return
+		}
+		// TODO it works but it should be improved
+		if time.Now().Hour() <= formattedTime.Hour() {
+			fmt.Printf(" %s, %s => %.1f°C, chance of rain: %.1f%%, %s\n",
+				weatherEmoji(hour.WillItRain), getTime(t), hour.TempC, hour.ChanceOfRain, strings.Trim(hour.Condition.Text, " "))
+		}
+
+	}
+}
+
+// chanse is an int8. 1 for true and 0 for false
+func weatherEmoji(chance int8) string {
+	if chance == 1 {
+		return "\U000026C8\U0000FE0F"
+	} else {
+		return "\U00002600\U0000FE0F"
 	}
 }

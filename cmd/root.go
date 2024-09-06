@@ -11,6 +11,7 @@ import (
 
 var location string
 var lang string
+var emojis bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -42,4 +43,5 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&location, "location", "l", "", "add a custom location")
 	//add a language flag for the API in order to avoid system default language
 	rootCmd.PersistentFlags().StringVarP(&lang, "language", "i", "", "add a language for the API. For example 'en', 'es', 'fr")
+	rootCmd.PersistentFlags().BoolVarP(&emojis, "emojis", "e", false, "use this flag to enable emojis")
 }
