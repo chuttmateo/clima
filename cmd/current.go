@@ -79,14 +79,14 @@ func printCurrentWithEmojis(forecast api.Forecast) {
 		}
 		// TODO it works but it should be improved
 		if time.Now().Hour() <= formattedTime.Hour() {
-			fmt.Printf(" %s, %s => %.1f°C, chance of rain: %.1f%%, %s\n",
+			fmt.Printf(" %s  %s => %.1f°C, chance of rain: %.1f%%, %s\n",
 				weatherEmoji(hour.WillItRain), getTime(t), hour.TempC, hour.ChanceOfRain, strings.Trim(hour.Condition.Text, " "))
 		}
 
 	}
 }
 
-// chanse is an int8. 1 for true and 0 for false
+// chance of rain is an int8. 1 for true and 0 for false. returns a cloud if it is 1 otherwise returns a sun
 func weatherEmoji(chance int8) string {
 	if chance == 1 {
 		return "\U000026C8\U0000FE0F"
